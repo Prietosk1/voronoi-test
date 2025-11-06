@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "Oski Voronoi",
   description:
     "Visualizacion interactiva de diagramas de Voronoi con D3.js y Next.js",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+  },
 };
 
 export default function RootLayout({
