@@ -24,6 +24,7 @@ export default function VoronoiCanvas() {
     svgRef: svgRef as RefObject<SVGSVGElement>,
     width,
     height,
+    colored: true,
   });
 
   return (
@@ -32,9 +33,12 @@ export default function VoronoiCanvas() {
       width="100%"
       height="100%"
       style={{
-        border: "1px solid #ccc",
+        display: "block",
         background: "#fafafa",
-        cursor: "pointer",
+        cursor: "crosshair",
+        position: "fixed",
+        top: 0,
+        left: 0,
       }}
       onClick={handleClick}
     />

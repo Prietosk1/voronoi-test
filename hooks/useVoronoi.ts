@@ -6,9 +6,16 @@ interface UseVoronoiProps {
   svgRef: RefObject<SVGSVGElement> | null;
   width: number;
   height: number;
+  colored?: boolean;
 }
 
-export function useVoronoi({ points, svgRef, width, height }: UseVoronoiProps) {
+export function useVoronoi({
+  points,
+  svgRef,
+  width,
+  height,
+  colored = false,
+}: UseVoronoiProps) {
   // Voronoi hook logic here
   useEffect(() => {
     const svgElement = svgRef?.current;
@@ -20,11 +27,22 @@ export function useVoronoi({ points, svgRef, width, height }: UseVoronoiProps) {
     const delaunay = d3.Delaunay.from(points);
     const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-    svg
-      .append("path")
-      .attr("d", voronoi.render())
-      .attr("fill", "none")
-      .attr("stroke", "#999");
+    // Generar una escala de color suave
+    const colorScale = d3
+      .scaleSequential(d3.interpolateCool)
+      .domain([0, points.length]);
+
+    points.forEach((_, i) => {
+      const path = voronoi.renderCell(i);
+      if (!path) return;
+
+      svg
+        .append("path")
+        .attr("d", path)
+        .attr("fill", colored ? colorScale(i) : "none")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1);
+    });
 
     svg
       .selectAll("circle")
@@ -32,9 +50,9 @@ export function useVoronoi({ points, svgRef, width, height }: UseVoronoiProps) {
       .join("circle")
       .attr("cx", (d) => d[0])
       .attr("cy", (d) => d[1])
-      .attr("r", 4)
-      .attr("fill", "tomato");
+      .attr("r", 3)
+      .attr("fill", "#111");
 
     console.log("Voronoi hook initialized");
-  }, [points, svgRef, width, height]);
+  }, [points, svgRef, width, height, colored]);
 }
