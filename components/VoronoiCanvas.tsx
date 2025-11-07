@@ -1,14 +1,20 @@
 "use client";
 import { useVoronoi } from "@/hooks/useVoronoi";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useRef } from "react";
+import OverlayPanel from "./OverlayPanel";
 
 export default function VoronoiCanvas() {
-  const [points, setPoints] = useState<[number, number][]>([]);
   const svgRef = useRef<SVGSVGElement | null>(null);
-
-  // Ocupa toda la pantalla
-  const width = typeof window !== "undefined" ? window.innerWidth : 0;
-  const height = typeof window !== "undefined" ? window.innerHeight : 0;
+  const {
+    setPoints,
+    clearPoints,
+    generateRandomPoints,
+    animateGrowth,
+    switchColorMode,
+    colored,
+  } = useVoronoi({
+    svgRef: svgRef as RefObject<SVGSVGElement>,
+  });
 
   const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
     const rect = svgRef.current!.getBoundingClientRect();
@@ -19,28 +25,29 @@ export default function VoronoiCanvas() {
     setPoints((prev) => [...prev, newPoint]);
   };
 
-  useVoronoi({
-    points,
-    svgRef: svgRef as RefObject<SVGSVGElement>,
-    width,
-    height,
-    colored: true,
-  });
-
   return (
-    <svg
-      ref={svgRef}
-      width="100%"
-      height="100%"
-      style={{
-        display: "block",
-        background: "#fafafa",
-        cursor: "crosshair",
-        position: "fixed",
-        top: 0,
-        left: 0,
-      }}
-      onClick={handleClick}
-    />
+    <div className="fixed inset-0">
+      <OverlayPanel
+        onAnimate={animateGrowth}
+        onClear={clearPoints}
+        onRandom={() => generateRandomPoints(25)}
+        onToggleColor={switchColorMode}
+        coloredMode={colored}
+      />
+      <svg
+        ref={svgRef}
+        width="100%"
+        height="100%"
+        style={{
+          display: "block",
+          background: "#fafafa",
+          cursor: "crosshair",
+          position: "fixed",
+          top: 0,
+          left: 0,
+        }}
+        onClick={handleClick}
+      />
+    </div>
   );
 }
